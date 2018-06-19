@@ -9,6 +9,16 @@ ENV PATH "${PATH}:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools/bin:${AND
 
 ENV DEBIAN_FRONTEND noninteractive
 
+
+# Expose ADB, ADB control and VNC ports
+EXPOSE 22
+EXPOSE 5037
+EXPOSE 5554
+EXPOSE 5555
+EXPOSE 5900
+EXPOSE 80
+EXPOSE 443
+
 # Install required tools
 # Dependencies to execute Android builds
 
@@ -20,11 +30,14 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
   libgcc1:i386 \
   libncurses5:i386 \
   libstdc++6:i386 \
-  zlib1g:i386 \
+  net-tools \
   openjdk-8-jdk \
-  wget \
+  openssh-server \
+  socat \
+  ssh \
   unzip \
   vim \
+  wget \
   && apt-get clean
 
 RUN groupadd android && useradd -d /opt/android-sdk-linux -g android android
@@ -43,4 +56,6 @@ RUN /opt/android-sdk-linux/tools/bin/sdkmanager "platforms;android-25"
 
 RUN /opt/android-sdk-linux/tools/bin/sdkmanager "system-images;android-25;google_apis;x86_64"
 
-CMD /opt/tools/entrypoint.sh built-in
+# CMD /opt/tools/entrypoint.sh built-in
+
+ENTRYPOINT ["/opt/tools/entrypoint.sh", "built-in", "launch_emulator"]
